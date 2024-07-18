@@ -18,7 +18,8 @@ from core.agents.task_reviewer import TaskReviewer
 from core.agents.tech_lead import TechLead
 from core.agents.tech_writer import TechnicalWriter
 from core.agents.troubleshooter import Troubleshooter
-from core.db.models.project_state import TaskStatus
+from core.agents.logger import Logger
+from core.db.models.project_state import TaskStatus, IterationStatus
 from core.log import get_logger
 from core.telemetry import telemetry
 from core.ui.base import ProjectStage
@@ -229,6 +230,12 @@ class Orchestrator(BaseAgent):
             if state.current_iteration["description"]:
                 # Break down the next iteration into steps
                 return Developer(self.state_manager, self.ui)
+            elif state.current_iteration["status"] == IterationStatus.TODO:
+                return Logger(self.state_manager, self.ui)
+            elif state.current_iteration["status"] == IterationStatus.AWAITING_TEST:
+                return Logger(self.state_manager, self.ui)
+            elif state.current_iteration["status"] == IterationStatus.AWAITING_LOG_IMPLEMENTATION:
+                return CodeMonkey(self.state_manager, self.ui, step={"type": "save_file", "save_file": {"path": "PATH_FILEA"}})
             else:
                 # We need to iterate over the current task but there's no solution, as Pythagora
                 # is stuck in a loop, and ProblemSolver needs to find alternative solutions.

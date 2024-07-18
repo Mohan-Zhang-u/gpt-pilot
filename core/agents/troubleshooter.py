@@ -9,7 +9,7 @@ from core.agents.mixins import IterationPromptMixin
 from core.agents.response import AgentResponse
 from core.config import ROUTE_FILES_AGENT_NAME
 from core.db.models.file import File
-from core.db.models.project_state import TaskStatus
+from core.db.models.project_state import TaskStatus, IterationStatus
 from core.llm.parser import JSONParser, OptionalCodeBlockParser
 from core.log import get_logger
 from core.telemetry import telemetry
@@ -65,28 +65,29 @@ class Troubleshooter(IterationPromptMixin, BaseAgent):
 
         user_feedback_qa = await self.generate_bug_report(run_command, user_instructions, user_feedback)
 
-        if is_loop:
-            if last_iteration["alternative_solutions"]:
-                # If we already have alternative solutions, it means we were already in a loop.
-                return self.try_next_alternative_solution(user_feedback, user_feedback_qa)
-            else:
-                # Newly detected loop, set up an empty new iteration to trigger ProblemSolver
-                llm_solution = ""
-                await self.trace_loop("loop-feedback")
-        else:
-            llm_solution = await self.find_solution(user_feedback, user_feedback_qa=user_feedback_qa)
+        # if is_loop:
+        #     if last_iteration["alternative_solutions"]:
+        #         # If we already have alternative solutions, it means we were already in a loop.
+        #         return self.try_next_alternative_solution(user_feedback, user_feedback_qa)
+        #     else:
+        #         # Newly detected loop, set up an empty new iteration to trigger ProblemSolver
+        #         llm_solution = ""
+        #         await self.trace_loop("loop-feedback")
+        # else:
+        #     llm_solution = await self.find_solution(user_feedback, user_feedback_qa=user_feedback_qa)
 
         self.next_state.iterations = self.current_state.iterations + [
             {
                 "id": uuid4().hex,
                 "user_feedback": user_feedback,
                 "user_feedback_qa": user_feedback_qa,
-                "description": llm_solution,
+                "description": None,
                 "alternative_solutions": [],
                 # FIXME - this is incorrect if this is a new problem; otherwise we could
                 # just count the iterations
                 "attempts": 1,
                 "completed": False,
+                "status": IterationStatus.TODO,
             }
         ]
         if len(self.next_state.iterations) == LOOP_THRESHOLD:

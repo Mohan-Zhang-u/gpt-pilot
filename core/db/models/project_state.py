@@ -30,6 +30,15 @@ class TaskStatus:
     SKIPPED = "skipped"
 
 
+class IterationStatus:
+    """Status of an iteration."""
+
+    TODO = "todo"
+    AWAITING_TEST = "awaiting_test"
+    LOGGING_FINISHED = "logging_finished"
+    DONE = "done"
+
+
 class ProjectState(Base):
     __tablename__ = "project_states"
     __table_args__ = (
@@ -105,6 +114,7 @@ class ProjectState(Base):
 
         :return: List of unfinished iterations.
         """
+        # TODO provjeriti statuse ovdje
         return [iteration for iteration in self.iterations if not iteration.get("completed")]
 
     @property
@@ -288,6 +298,7 @@ class ProjectState(Base):
         self.unfinished_iterations[0]["completed"] = True
         self.flag_iterations_as_modified()
 
+    # TODO jel treba kaj sa ovime???
     def flag_iterations_as_modified(self):
         """
         Flag the iterations field as having been modified

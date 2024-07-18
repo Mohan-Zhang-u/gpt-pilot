@@ -29,6 +29,7 @@ class CodeMonkey(BaseAgent):
         if self.prev_response and self.prev_response.type == ResponseType.DESCRIBE_FILES:
             return await self.describe_files()
         else:
+            # TODO ili ovo koristiti ili napraviti novu funkciju
             return await self.implement_changes()
 
     async def implement_changes(self) -> AgentResponse:
@@ -69,7 +70,7 @@ class CodeMonkey(BaseAgent):
             instructions = self.current_state.current_task["instructions"]
 
         convo = AgentConvo(self).template(
-            "implement_changes",
+            "implement_changes" if "implement_changes" else "implement_changes",
             file_name=file_name,
             file_content=file_content,
             instructions=instructions,

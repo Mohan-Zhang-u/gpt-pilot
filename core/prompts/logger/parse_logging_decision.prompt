@@ -1,0 +1,55 @@
+Now, parse the previous explanation about whether to add more logs or if the explanation is clear. If logs need to be added, write 5 lines of code before the line where the log needs to be added. Each log needs to start with "PYTHAGORA_DEBUGGING_LOG". Here is an example:
+Let's say we have a Python code snippet like this:
+```
+    async def run(self) -> bool:
+        """
+        Run the Orchestrator agent.
+
+        :return: True if the Orchestrator exited successfully, False otherwise.
+        """
+        response = None
+
+        print(f"Starting {__name__}.Orchestrator")
+
+        self.executor = Executor(self.state_manager, self.ui)
+        self.process_manager = self.executor.process_manager
+        # self.chat = Chat() TODO
+
+        await self.init_ui()
+        await self.offline_changes_check()
+
+        # TODO: consider refactoring this into two loop; the outer with one iteration per comitted step,
+        # and the inner which runs the agents for the current step until they're done. This would simplify
+        # handle_done() and let us do other per-step processing (eg. describing files) in between agent runs.
+        while True:
+            await self.update_stats()
+
+            agent = self.create_agent(response)
+            response = await agent.run()
+
+            if response.type == ResponseType.EXIT:
+                break
+
+            if response.type == ResponseType.DONE:
+                response = await self.handle_done(agent, response)
+                continue
+```
+
+and the new log that needs to be added is `print(f"Starting {__name__}.Orchestrator")`, you should provide this as a reference code snippet:
+```
+
+        :return: True if the Orchestrator exited successfully, False otherwise.
+        """
+        response = None
+
+```
+and `print(f"PYTHAGORA_DEBUGGING_LOG: Starting {__name__}.Orchestrator")` as a log.
+
+**IMPORTANT**
+Make sure that you outline **ALL** logs that need to be added and not miss any.
+
+**IMPORTANT**
+Make sure that `referenceCodeSnippet` contains **ONLY** the code that is currently written in the file. It must not contain the log that you want to add.
+
+{% include "partials/file_naming.prompt" %}
+{% include "partials/relative_paths.prompt" %}

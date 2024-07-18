@@ -1,0 +1,40 @@
+You are working on an app called "{{ state.branch.project.name }}" and you need to write code for the entire application.
+
+{% include "partials/project_details.prompt" %}
+
+{% if state.tasks and state.current_task %}
+Development process of this app was split into smaller tasks. Here is the list of all tasks:
+```{% for task in state.tasks %}
+{{ loop.index }}. {{ task.description }}
+{% endfor %}
+```
+
+You are currently working on, and have to focus only on, this task:
+```
+{{ current_task.description }}
+```
+
+{% endif %}
+A part of the app is already finished.
+{% include "partials/files_list.prompt" %}
+
+{% include "partials/user_feedback.prompt" %}
+
+{% if next_solution_to_try is not none %}
+Focus on solving this issue in the following way:
+```
+{{ next_solution_to_try }}
+```
+{% endif %}
+{#{% include "partials/doc_snippets.prompt" %}#}
+
+Based on this information, you need to figure out where is the problem that the user described. You have 2 options - to tell me exactly where is the problem happening or to add more logs to better determine where is the problem. What do you want to do?
+
+**IMPORTANT**
+When you write code, you **MUST NOT** add any new lines of code except the logs. That means that the number of lines of code that you add **MUST** equal the number of new comments you add. If you add a log, make sure that the log starts with "PYTHAGORA_DEBUGGING_LOG". For example, if you want to add a log in a Python code `print("Hello, World!")`, you should put `print("PYTHAGORA_DEBUGGING_LOG: Hello, World!")` instead. This refers to **ONLY** the logs you want to add that are not in the codebase at the moment. All logs that are in the codebase already, you must not change.
+
+**IMPORTANT**
+All the code that you write, with the exception of new logs you want to add, **MUST** be **EXACTLY** the same as in the currently written files from the above. That includes all comments, logs, and **EVERY SINGLE CHARACTER** in the code.
+
+{% include "partials/file_naming.prompt" %}
+{% include "partials/relative_paths.prompt" %}
